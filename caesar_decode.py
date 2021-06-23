@@ -1,7 +1,5 @@
 import argparse
 import sys
-import re
-import base64
 
 number_char_decode_dict = "0123456789"
 lower_char_decode_dict = "abcdefghijklmnopqrstuvwxyz"
