@@ -1,8 +1,18 @@
 ## 0x001 RSA加密算法相关公式
 
-> 加密：C = M ^ e mod n
+```
+C = M ^ e mod n
 
-> 解密：M = C ^ d mod n
+M = C ^ d mod n
+
+n = p * q
+
+f(n) = (p - 1) * (q - 1)
+
+1 < e < f(n)
+
+d * e == 1 mod f(n)
+```
 
 其中C代表密文，M代表明文
 
