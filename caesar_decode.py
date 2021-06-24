@@ -1,5 +1,6 @@
 import argparse
 import sys
+import time
 
 number_char_decode_dict = "0123456789"
 lower_char_decode_dict = "abcdefghijklmnopqrstuvwxyz"
@@ -14,12 +15,15 @@ def set_encode_dict(number_move, lower_move, upper_move):
     global lower_char_encode_dict
     global upper_char_encode_dict
     
+    number_char_encode_dict = ""
     for i,j in enumerate(number_char_decode_dict):
         number_char_encode_dict += chr((ord(j) - 48 + number_move) % 10 + 48)
-        
+    
+    lower_char_encode_dict = ""
     for i,j in enumerate(lower_char_decode_dict):
         lower_char_encode_dict += chr((ord(j) - 97 + lower_move) % 26 + 97 )
-        
+    
+    upper_char_encode_dict = ""
     for i,j in enumerate(upper_char_decode_dict):
         upper_char_encode_dict += chr((ord(j) - 65 + upper_move) % 26 + 65)
 
@@ -51,7 +55,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     if (args.default == None) and (args.number == None) and (args.upper == None) and (args.lower == None):
-        print ("Not Find Move Parameter.")
+        print ("Not Find Parameter.")
+        sys.exit(0)
+        
+    if args.cipher_text == None:
+        print ("Not Find Parameter.")
         sys.exit(0)
         
     if args.default != None:
@@ -74,8 +82,12 @@ if __name__ == '__main__':
         else:
             lower_move = 0
     
-    set_encode_dict(number_move, upper_move, lower_move)
-    if args.cipher_text != None:
+    if (number_move == 0) and (upper_move == 0) and (lower_move == 0):
+        for i in range(1, 26):
+            print ("offset : " + str(i))
+            set_encode_dict(i, i, i)
+            caesar_encode(args.cipher_text)
+            time.sleep(1)
+    else:
+        set_encode_dict(number_move, upper_move, lower_move)
         caesar_encode(args.cipher_text)
-        
-    
