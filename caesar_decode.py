@@ -89,5 +89,5 @@ if __name__ == '__main__':
             caesar_encode(args.cipher_text)
             time.sleep(1)
     else:
-        set_encode_dict(number_move, upper_move, lower_move)
+        set_encode_dict(number_move, lower_move, upper_move)
         caesar_encode(args.cipher_text)
