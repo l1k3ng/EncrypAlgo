@@ -6,6 +6,64 @@ import sys
 import os
 from factordb.factordb import FactorDB
 
+##############################低解密指数攻击######################################
+# 使用辗转相处将分数 x/y 转为连分数的形式
+def transform(x, y):
+    res = []
+    while y:
+        res.append(x // y)
+        x, y = y, x % y
+    return res
+    
+def continued_fraction(sub_res):
+    numerator, denominator = 1, 0
+    # 从sublist的后面往前循环
+    for i in sub_res[::-1]:
+        denominator, numerator = numerator, i * numerator + denominator
+        
+    # 得到渐进分数的分母和分子，并返回
+    return denominator,numerator
+
+# 求解每个渐进分数
+def sub_fraction(x, y):
+    res = transform(x, y)
+    # 将连分数的结果逐一截取以求渐进分数
+    res = list(map(continued_fraction, (res[0:i] for i in range(1, len(res)))))
+    return res
+
+# 由 p + q 和 p * q 的值通过维达定理来求解 p 和 q
+def get_pq(a, b, c):
+    #由上述可得，开根号一定是整数，因为有解
+    par = gmpy2.isqrt(b * b - 4 * a * c)
+    x1, x2 = (-b + par) // (2 * a), (-b - par) // (2 * a)
+    return x1, x2
+
+# 低解密指数攻击（维达攻击）
+def wienerAttack(e, n):
+    d = 0
+    # 用一个for循环来注意试探 e/n 的连续函数的渐进分数，直到找到一个满足条件的渐进分数
+    for (d, k) in sub_fraction(e, n):
+        # 可能会出现连分数的第一个为0的情况，排除
+        if k == 0:
+            continue
+        
+        #ed=1 (mod φ(n)) 因此如果找到了d的话，(ed-1)会整除φ(n), 也就是存在k使得(e*d-1) // k = φ(n)
+        if (e * d - 1) % k != 0:
+            continue
+        
+        # 这个结果就是 φ(n)
+        phi_n = (e * d - 1) // k
+        px ,qy=get_pq(1, n - phi_n + 1, n)
+        if px * qy == n:
+            # 可能会得到两个负数，负负得正未尝不会出现
+            p, q = abs(int(px)), abs(int(qy))
+            
+            #求ed=1 (mod  φ(n))的结果，也就是e关于 φ(n)的乘法逆元d
+            d = gmpy2.invert(e, (p - 1) * (q - 1))
+            break
+    return d
+#################################################################################
+
 # 大素数分解
 def big_num_resolve(data):
     factor = FactorDB(data)
@@ -199,6 +257,17 @@ if __name__ == '__main__':
                 rsa_c2 = gmpy2.mpz(input("input c2 : "))
                 
                 common_mode_attack(rsa_n, rsa_c1, rsa_c2, rsa_e1, rsa_e2)
+                sys.exit(0)
+        elif int(args.dec_mode) == 7:
+            if (args.rsa_n != None) and (args.rsa_e != None):
+                rsa_n = gmpy2.mpz(args.rsa_n)
+                rsa_e = gmpy2.mpz(args.rsa_e)
+                
+                rsa_d = wienerAttack(rsa_e, rsa_n)
+                if rsa_d != 0:
+                    print ("私钥 (d)  : " + str(rsa_d))
+                else:
+                    print ("无法解出私钥 (d)")
                 sys.exit(0)
         else:
             print ("rsa decrypt mode choose error.")
