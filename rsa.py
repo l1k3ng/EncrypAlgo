@@ -1,10 +1,10 @@
+import gmpy2
 from Crypto.PublicKey import RSA
 import subprocess
 import argparse
 import sys
 import os
 from factordb.factordb import FactorDB
-import gmpy2
 
 # 大素数分解
 def big_num_resolve(data):
@@ -25,6 +25,7 @@ def calc_private_key(rsa_para, priv_file=False):
             with open("private.pem", "wb") as fp:
                 fp.write(keypair.export_key())
                 print ("成功生成私钥 : private.pem")
+
 
 # 通过dp或dq求d
 def calc_dp_or_dq(rsa_para, rsa_dp, rsa_dq):
@@ -55,7 +56,7 @@ def calc_dp_and_dq(rsa_para, enc_data, rsa_dp, rsa_dq):
 # 小指数爆破直接获取明文
 def small_index_crack(rsa_para, enc_data, len=1000):
     for i in range(1000):
-        result = gmpy2.iroot(enc_data+i*rsa_para["n"], 3)
+        result = gmpy2.iroot(enc_data+i*rsa_para["n"], rsa_para["e"])
         if result[1] == True:
             print ("明文 (m)  : " + str(result[0]))
             break
