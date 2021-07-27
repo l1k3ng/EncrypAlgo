@@ -144,9 +144,22 @@ def decrypt_rsa_enc(rsa_para, enc_file=None, enc_data=None):
         rsa_m = pow(rsa_c, rsa_para["d"], rsa_para["n"])
         print ("明文 (m)  : " + str(rsa_m))
 
+def usage():
+    info = """
+    RSA私钥破解程序
+    mode 1 : 已知n、e，暴力破解q、p，获取私钥d
+    mode 2 : 已知p、q，获取私钥d
+    mode 3 : 已知n，通过dp或dq，破解私钥d
+    mode 4 : 已知p、q，通过dp或dq，破解私钥d
+    mode 5 : 低加密指数攻击
+    mode 6 : 共模攻击
+    mode 7 : 低解密指数攻击
+    """
+    print (info)
+
 if __name__ == '__main__':
     rsa_para = {"n": 0, "e": 0, "p": 0, "q": 0, "d": 0}
-    
+    usage()
     parser = argparse.ArgumentParser()
     parser.add_argument('-mode', '--dec_mode', default=None, help="choose attack mode")
     
