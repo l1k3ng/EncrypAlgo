@@ -143,6 +143,10 @@ def decrypt_rsa_enc(rsa_para, enc_file=None, enc_data=None):
         rsa_c = gmpy2.mpz(enc_data)
         rsa_m = pow(rsa_c, rsa_para["d"], rsa_para["n"])
         print ("明文 (m)  : " + str(rsa_m))
+        
+def int_to_string(data):
+    result = bytes.fromhex(hex(gmpy2.mpz(data))[2:]).decode()
+    return result
 
 def usage():
     info = """
@@ -174,7 +178,13 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--rsa_c', default=None)
     parser.add_argument("-dp", '--rsa_dp', default=None)
     parser.add_argument("-dq", '--rsa_dq', default=None)
+    
+    parser.add_argument("-int_to_string", '--int_to_string', default=None)
     args = parser.parse_args()
+    
+    if args.int_to_string != None:
+        result = int_to_string(args.int_to_string)
+        print (result)
     
     if args.dec_mode != None:
         # 模式1：已知n、e，暴力破解q、p
